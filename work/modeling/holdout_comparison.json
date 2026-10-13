@@ -1,0 +1,58 @@
+{
+  "note": "First and only holdout metric read for Workshop 1.",
+  "n_train": 5634,
+  "n_holdout": 1409,
+  "baseline": {
+    "chromosome": {
+      "model": "logistic_regression",
+      "scaling_method": "standard",
+      "imbalance_method": "none",
+      "logistic_regression": {
+        "C": 1.0
+      },
+      "xgboost": {
+        "n_estimators": 100,
+        "max_depth": 3,
+        "learning_rate": 0.1
+      }
+    },
+    "metrics": {
+      "f1": 0.7030812324929971,
+      "precision": 0.7382352941176471,
+      "recall": 0.6711229946524064,
+      "confusion_matrix": {
+        "tn": 946,
+        "fp": 89,
+        "fn": 123,
+        "tp": 251
+      }
+    }
+  },
+  "champion": {
+    "chromosome": {
+      "model": "xgboost",
+      "scaling_method": "standard",
+      "imbalance_method": "none",
+      "logistic_regression": {
+        "C": 7.113043196759924
+      },
+      "xgboost": {
+        "n_estimators": 115,
+        "max_depth": 5,
+        "learning_rate": 0.04662540963655612
+      }
+    },
+    "metrics": {
+      "f1": 0.7079136690647482,
+      "precision": 0.7663551401869159,
+      "recall": 0.6577540106951871,
+      "confusion_matrix": {
+        "tn": 960,
+        "fp": 75,
+        "fn": 128,
+        "tp": 246
+      }
+    },
+    "source": "work/optimization/champion_chromosome.json"
+  }
+}

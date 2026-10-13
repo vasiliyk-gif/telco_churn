@@ -1,0 +1,89 @@
+chromosome:
+  type: dict
+  generation:
+    type: per_item
+    non_required_probability: 0
+  mutation:
+    type: random
+    percentage_to_mutate: 0.15
+    max_percentage_to_mutate: 0.25
+    num_items_to_mutate: 2
+    max_num_items_to_mutate: 3
+    drift_factor: 1.1
+  crossover:
+    type: per_item_crossover
+    per_item_select_strategy: random
+  content:
+
+    model:
+      type: enum
+      values:
+        - logistic_regression
+        - xgboost
+      generation: { type: uniform }
+      mutation: { type: random }
+      crossover: { type: error }
+
+    scaling_method:
+      type: enum
+      values:
+        - none
+        - standard
+      generation: { type: uniform }
+      mutation: { type: random }
+      crossover: { type: error }
+
+    imbalance_method:
+      type: enum
+      values:
+        - none
+        - class_weight_balanced
+      generation: { type: uniform }
+      mutation: { type: random }
+      crossover: { type: error }
+
+    logistic_regression:
+      type: dict
+      generation: { type: per_item, non_required_probability: 0 }
+      mutation: { type: random, percentage_to_mutate: 0.3 }
+      crossover: { type: per_item_crossover }
+      content:
+        C:
+          type: float
+          min_value: 0.01
+          max_value: 10.0
+          generation: { type: uniform }
+          mutation: { percentage_change: 0.3 }
+          crossover: { type: random }
+
+    xgboost:
+      type: dict
+      generation: { type: per_item, non_required_probability: 0 }
+      mutation: { type: random, percentage_to_mutate: 0.3 }
+      crossover: { type: per_item_crossover }
+      content:
+        n_estimators:
+          type: int
+          min_value: 50
+          max_value: 200
+          generation: { type: uniform }
+          mutation:
+            step_size: 10
+            percentage_change: 0.2
+          crossover: { type: random }
+        max_depth:
+          type: int
+          min_value: 2
+          max_value: 6
+          generation: { type: uniform }
+          mutation:
+            step_size: 1
+            percentage_change: 0.2
+          crossover: { type: random }
+        learning_rate:
+          type: float
+          min_value: 0.03
+          max_value: 0.3
+          generation: { type: uniform }
+          mutation: { percentage_change: 0.2 }
+          crossover: { type: random }

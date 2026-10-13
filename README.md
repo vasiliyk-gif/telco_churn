@@ -37,16 +37,19 @@ tag during the exercise.
 
 ## Setup
 
-Use Python 3.12. Create the virtual environment in `.venv` and activate it before
-installing packages or running workshop commands.
+### Student checkout
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python --version
+git checkout workshop-1-start-v2
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # set EARTH_USER / EARTH_PASS
+python earth/check_connection.py
 ```
 
-`python --version` should print Python 3.12.x.
+Use Python 3.12. `.venv/` is local and is not committed.
+
+`python --version` should print Python 3.12.x after activate.
 
 If `python3.12` is not on your `PATH`, create the environment with a Python 3.12
 interpreter you already have. For a pyenv install of 3.12.3:
@@ -57,14 +60,6 @@ source .venv/bin/activate
 ```
 
 On Windows, activate with `.venv\Scripts\activate`.
-
-`.venv/` is local and is not committed.
-
-```bash
-pip install -r requirements.txt
-cp .env.example .env
-# edit .env with EARTH_USER and EARTH_PASS
-```
 
 ## Verify Earth connection
 

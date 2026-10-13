@@ -1,0 +1,7 @@
+{
+  "dataset_id": "d6050858-a5a2-49ee-b26a-087c61b9a37d",
+  "project_id": "d4514877159443cba319d7b519a647e8",
+  "experiment_id": "4cf6cc09830d483490d5f87145d8f0fd",
+  "train_csv": "work/exploration/train.csv",
+  "chromosome": "work/modeling/chromosome.yaml"
+}

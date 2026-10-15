@@ -45,7 +45,7 @@ Column meanings: [data/data_dictionary.md](data/data_dictionary.md).
 You need Python 3.12 and your Earth login.
 
 ```bash
-git clone --branch s4-class-v1 --single-branch https://github.com/vasiliyk-gif/telco_churn.git
+git clone --branch s4-class-v2 --single-branch https://github.com/vasiliyk-gif/telco_churn.git
 cd telco_churn
 python3.12 -m venv .venv
 source .venv/bin/activate

@@ -66,7 +66,10 @@ def validate_yaml_text(session, headers, chromosome_yaml: str) -> dict:
             "warnings": [],
             "errors": ["YAML root must be a mapping with key 'chromosome'"],
         }
-    resp = session.post(VALIDATE_URL, json=parsed, headers=headers, timeout=60)
+    # Send only the chromosome block. A UI-exported YAML also carries
+    # fitness_function / ai1 / ai2, which make the validator fail with HTTP 500.
+    resp = session.post(VALIDATE_URL, json={"chromosome": parsed["chromosome"]},
+                        headers=headers, timeout=60)
     if resp.status_code == 400:
         try:
             detail = resp.json()

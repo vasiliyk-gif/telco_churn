@@ -1,46 +1,39 @@
-# Earth integration (this repository)
-
-Reusable Earth REST client and contracts for Workshop 1.
-
-## Workshop use
+# Earth tools (homework)
 
 ```bash
-# Student readiness (no experiment)
-python earth/check_connection.py
-
-# Chromosome schema check (after you write work/modeling/chromosome.yaml)
-python earth/validate_chromosome.py work/modeling/chromosome.yaml
+python earth/check_connection.py                     # login check, no experiment
+python earth/check_local.py                          # run your fitness locally on sample chromosomes
+python earth/validate_chromosome.py work/optimization/chromosome.yaml   # Earth's schema check
+python earth/run_search.py --name run1               # upload, launch, poll, save to work/runs/run1/
+python earth/compare_runs.py run1 run2               # champions side by side
+python earth/fetch_history.py --name run1            # every generation -> work/runs/run1/history.csv
 ```
 
-On the facilitator solution pathway, `earth/run_search.py` uploads
-`work/exploration/train.csv` and the sibling modules under `work/modeling/`.
+Defaults: `work/exploration/train.csv`, `work/optimization/chromosome.yaml`,
+`work/optimization/fitness.py`. Change them with `--train`, `--chromosome`,
+`--fitness`; add extra files with `--assets`. `run_search.py` refuses to upload
+`test.csv`. Run size: `--pop` (10), `--units` (5), `--cpus` (1), `--minutes`
+(15); `--no-wait` and `--collect` to launch now and fetch the result later. The
+other GA settings come from the YAML's `ai1` block if it has one, else defaults.
 
-```python
-from earth_client import auth, upload_dataset, clone_template, launch, poll, abort
-
-session, headers = auth(password_only=True)
-```
-
-## Important files
+## Files
 
 | File | Role |
 |------|------|
+| `fitness_skeleton.py` | Starting point for `work/optimization/fitness.py` |
+| `run_search.py` | Local check, upload, launch, poll, save one run |
+| `check_local.py` | Runs the fitness locally on sample chromosomes |
+| `validate_chromosome.py` | Earth's chromosome validator + a negative control |
+| `compare_runs.py` | Compares saved runs and shows what changed |
+| `fetch_history.py` | Downloads every generation of a run for analysis |
 | `earth_client.py` | Auth, dataset upload, launch, poll, abort |
-| `check_connection.py` | Password-only auth + template + running-count |
-| `validate_chromosome.py` | `POST /api/evl/chromosome/validate` + negative control |
-| `context/` | Earth GA contracts (inherited; see `NOTES_FOR_THIS_REPO.md`) |
-| `reference/moxo_era_spike_findings.md` | Dated platform observations |
+| `check_connection.py` | Login + template + running-count |
+| `context/` | Earth GA contract references (see `NOTES_FOR_THIS_REPO.md`) |
 
 ## Auth
 
 Set `EARTH_USER` / `EARTH_PASS` in `.env` (login name often without `@domain`).
-Workshop scripts call `auth(password_only=True)` so a bad password exits instead
-of hanging on device code. Auth prefers the ZITADEL **access_token** (it carries
-`org_id` for `x-jwt-org-id`). Optional: set `EARTH_ORG_ID` explicitly. Tokens are
-cached in `.earth_token_cache.json` (gitignored).
-
-## Reference only (do not run as the workshop)
-
-`chromosome.yaml` and `recover_run.py` are inherited MOXO clustering history.
-They are not the Workshop 1 search space. The workshop chromosome lives under
-`work/modeling/` after formulation.
+Scripts log in with `POST /api/auth/login` and use the ZITADEL **access_token**
+(it carries `org_id` for `x-jwt-org-id`); a bad password exits with a clear
+message. Optional: set `EARTH_ORG_ID` explicitly. Tokens are cached in
+`.earth_token_cache.json` (gitignored).

@@ -1,3 +1,9 @@
+> **Source:** the Earth binary-classifier template. Read "template" as "your
+> `fitness.py`". It is a checklist for Step 5 (Formulate).
+>
+> In this homework the money (€10 per call, €70 per subscription) and the calling
+> rule (how many to call) stay in `fitness.py`; they are never genes.
+
 # Chromosome Philosophy – Binary Classifier Template
 
 The chromosome represents a configuration of:

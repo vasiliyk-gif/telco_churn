@@ -84,22 +84,6 @@ Optuna, Hyperopt, Ray, Statsmodels, Prophet.
 
 ---
 
-## Chromosome Design for Clustering (MOXO Context)
-
-Relevant gene categories for behavioral profile clustering:
-
-- Routing strategy (enum: global, age_group, gender, age_gender)
-- Clustering algorithm (enum: kmeans, gmm)
-- Number of clusters k (int, bounded)
-- GMM covariance type (enum)
-- Representation family (enum: hybrid, direct, derived-index)
-- PCA enabled (bool) and n_components (int)
-- Feature group weights: global, component_totals, component_modalities (float)
-- Assignment mode (enum: hard, soft)
-- Anomaly distance percentile (float)
-
----
-
 ## Final Rule
 
 If unsure whether logic belongs in Earth or Python:

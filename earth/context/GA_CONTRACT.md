@@ -120,7 +120,7 @@ If minimizing, invert score explicitly inside fitness.
 
 ## Key Gotchas (Validated Against earth.evolution.inc)
 
-1. Auth uses the Keycloak **`id_token`**, not `access_token`.
+1. Auth uses the ZITADEL **`access_token`** from `POST /api/auth/login`, not the `id_token`: only the access token carries `org_id` for the `x-jwt-org-id` header.
 2. Start experiments with a **fully-populated `fitness_unit`** — incomplete payloads 503.
 3. **Enum** chromosome genes must use `crossover: {type: error}`.
 4. The `requirements` field is accepted but **not pip-installed** — only pre-baked libs or vendored pure-Python code.

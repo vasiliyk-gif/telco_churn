@@ -1,3 +1,8 @@
+# GENE MENU, NOT RUNNABLE HERE.
+# The full search space of the Earth binary-classifier template. Use it in Step 5
+# as a menu of gene ideas (imputation, encoding, feature selection, outliers,
+# imbalance handling, model blocks) and as YAML syntax examples. Copy only the
+# genes your own fitness.py implements; every gene needs code that reads it.
 chromosome:
   type: dict
   generation:

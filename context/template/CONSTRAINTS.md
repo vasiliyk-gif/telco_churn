@@ -1,3 +1,11 @@
+> **Source:** the Earth binary-classifier template. Read "template" as "your
+> `fitness.py` and `chromosome.yaml`". Use it as a checklist in Step 6 (Package
+> and validate), before your first Earth run.
+>
+> In this homework the money (€10 per call, €70 per subscription) and the calling
+> rule are fixed in `fitness.py` on purpose. The rules below about business cost
+> models and business assumptions apply to the chromosome: no gene may change them.
+
 # Known Constraints – Binary Classifier Template
 
 These are structural constraints discovered during development.

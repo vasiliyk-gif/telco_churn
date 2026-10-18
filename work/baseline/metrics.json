@@ -1,0 +1,61 @@
+{
+  "protocol": "work/design.md: 5 stratified folds (seed 42), inner 3-fold CV picks the share to call",
+  "data": "work/exploration/train.csv",
+  "features": {
+    "num": [
+      "age",
+      "previous"
+    ],
+    "cat": [
+      "job",
+      "marital",
+      "education",
+      "default",
+      "housing",
+      "loan",
+      "contact",
+      "poutcome"
+    ]
+  },
+  "references": {
+    "call_everyone": {
+      "profit_per_1000_mean": -2107.5,
+      "profit_per_1000_std": 21.43303524935281,
+      "profit_per_1000_per_fold": [
+        -2125.0,
+        -2125.0,
+        -2125.0,
+        -2081.2,
+        -2081.2
+      ],
+      "share_called_mean": 1.0,
+      "score": 1e-09
+    },
+    "poutcome_success": {
+      "profit_per_1000_mean": 1225.0,
+      "profit_per_1000_std": 219.90765107198976,
+      "profit_per_1000_per_fold": [
+        1200.0,
+        1631.2,
+        1175.0,
+        1156.2,
+        962.5
+      ],
+      "share_called_mean": 0.03325,
+      "score": 0.18107908351810792
+    },
+    "logistic_regression": {
+      "profit_per_1000_mean": 1488.75,
+      "profit_per_1000_std": 231.01001060560125,
+      "profit_per_1000_per_fold": [
+        1468.8,
+        1912.5,
+        1243.8,
+        1493.8,
+        1325.0
+      ],
+      "share_called_mean": 0.118,
+      "score": 0.22006651884700665
+    }
+  }
+}

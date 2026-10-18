@@ -1,0 +1,641 @@
+# GENE MENU, NOT RUNNABLE HERE.
+# The full search space of the Earth binary-classifier template. Use it in Step 5
+# as a menu of gene ideas (imputation, encoding, feature selection, outliers,
+# imbalance handling, model blocks) and as YAML syntax examples. Copy only the
+# genes your own fitness.py implements; every gene needs code that reads it.
+chromosome:
+  type: dict
+  generation:
+    type: per_item
+    non_required_probability: 0.1
+  mutation:
+    type: random
+    percentage_to_mutate: 0.15
+    max_percentage_to_mutate: 0.2
+    num_items_to_mutate: 2
+    max_num_items_to_mutate: 3
+    drift_factor: 1.1
+  crossover:
+    type: per_item_crossover
+    per_item_select_strategy: random
+  content:
+    # ============================================
+    # Feature Engineering (NEW - Major Search Space)
+    # ============================================
+    feature_selection_method:
+      type: enum
+      values:
+        - none
+        - variance
+        - correlation
+        - mutual_info
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    feature_selection_threshold:
+      type: float
+      min_value: 0.0
+      max_value: 1.0
+      generation:
+        type: uniform
+      mutation:
+        percentage_change: 0.2
+      crossover:
+        type: random
+    categorical_selection_method:
+      type: enum
+      values:
+        - none
+        - boolean_array
+        - churn_variance
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    categorical_selection_array:
+      type: array
+      min_size: 1
+      max_size: 1
+      consecutive: false
+      generation:
+        type: per_item
+      mutation:
+        type: random
+        percentage_to_mutate: 0.2
+        max_percentage_to_mutate: 0.3
+        num_items_to_mutate: 1
+        max_num_items_to_mutate: 2
+        drift_factor: 1.1
+      crossover:
+        type: per_item_select
+        per_item_select_strategy: random
+      item_definition:
+        type: bool
+        generation:
+          type: uniform
+        mutation:
+          type: random
+        crossover:
+          type: error
+    categorical_selection_variance_threshold:
+      type: float
+      min_value: 0.0
+      max_value: 1.0
+      generation:
+        type: uniform
+      mutation:
+        percentage_change: 0.2
+      crossover:
+        type: random
+    scaling_method:
+      type: enum
+      values:
+        - none
+        - standard
+        - minmax
+        - robust
+        - quantile
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    power_transform:
+      type: enum
+      values:
+        - none
+        - yeo_johnson
+        - box_cox
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    outlier_handling:
+      type: enum
+      values:
+        - none
+        - clip
+        - winsorize
+        - iqr_remove
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    create_interactions:
+      type: bool
+    interaction_degree:
+      type: int
+      min_value: 2
+      max_value: 3
+      generation:
+        type: uniform
+      mutation:
+        step_size: 1
+        percentage_change: 0.2
+      crossover:
+        type: random
+    binning_numerical:
+      type: bool
+    n_bins:
+      type: int
+      min_value: 3
+      max_value: 20
+      generation:
+        type: uniform
+      mutation:
+        step_size: 2
+        percentage_change: 0.2
+      crossover:
+        type: random
+    
+    # ============================================
+    # Preprocessing (Per-Column Arrays)
+    # ============================================
+    # Array sizes are set dynamically by generate_search_space.py based on
+    # len(numerical_columns) and len(categorical_columns) from parameters
+    numerical_imputation:
+      type: array
+      min_size: 1
+      max_size: 1
+      consecutive: false
+      generation:
+        type: per_item
+      mutation:
+        type: random
+        percentage_to_mutate: 0.1
+        max_percentage_to_mutate: 0.1
+        num_items_to_mutate: 1
+        max_num_items_to_mutate: 1
+        drift_factor: 1.1
+      crossover:
+        type: per_item_select
+        per_item_select_strategy: random
+      item_definition:
+        type: enum
+        values:
+          - mean
+          - constant_zero
+        generation:
+          type: uniform
+        crossover:
+          type: error
+    categorical_imputation:
+      type: array
+      min_size: 1
+      max_size: 1
+      consecutive: false
+      generation:
+        type: per_item
+      mutation:
+        type: random
+        percentage_to_mutate: 0.1
+        max_percentage_to_mutate: 0.1
+        num_items_to_mutate: 1
+        max_num_items_to_mutate: 1
+        drift_factor: 1.1
+      crossover:
+        type: per_item_select
+        per_item_select_strategy: random
+      item_definition:
+        type: enum
+        values:
+          - most_frequent
+          - constant_missing
+        generation:
+          type: uniform
+        crossover:
+          type: error
+    categorical_encoding:
+      type: array
+      min_size: 1
+      max_size: 1
+      consecutive: false
+      generation:
+        type: per_item
+      mutation:
+        type: random
+        percentage_to_mutate: 0.1
+        max_percentage_to_mutate: 0.1
+        num_items_to_mutate: 1
+        max_num_items_to_mutate: 1
+        drift_factor: 1.1
+      crossover:
+        type: per_item_select
+        per_item_select_strategy: random
+      item_definition:
+        type: enum
+        values:
+          - onehot
+          - ordinal
+          - no_encoding
+        generation:
+          type: uniform
+        crossover:
+          type: error
+    numerical_standardization:
+      type: array
+      min_size: 1
+      max_size: 1
+      consecutive: false
+      generation:
+        type: per_item
+      mutation:
+        type: random
+        percentage_to_mutate: 0.1
+        max_percentage_to_mutate: 0.1
+        num_items_to_mutate: 1
+        max_num_items_to_mutate: 1
+        drift_factor: 1.1
+      crossover:
+        type: per_item_select
+        per_item_select_strategy: random
+      item_definition:
+        type: enum
+        values:
+          - none
+          - standard
+          - MaxAbsScaler
+          - quantile
+          - RobustScaler
+        generation:
+          type: uniform
+        crossover:
+          type: error
+    # Backward compatibility: keep encoding_method for projects using old chromosome format
+    encoding_method:
+      type: enum
+      values:
+        - onehot
+        - ordinal
+        - no_encoding
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    cardinality_threshold:
+      type: enum
+      values: [10, 20, 30]
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    
+    # ============================================
+    # Model Ensemble Weights & Hyperparameters
+    # ============================================
+    # Ensemble weights (0.0 to 1.0) for each model type
+    # Weights are normalized to sum to 1.0 in the pipeline
+    model_weight_xgboost:
+      type: float
+      min_value: 0.0
+      max_value: 1.0
+      generation:
+        type: uniform
+      mutation:
+        percentage_change: 0.2
+      crossover:
+        type: random
+    model_weight_logistic_regression:
+      type: float
+      min_value: 0.0
+      max_value: 1.0
+      generation:
+        type: uniform
+      mutation:
+        percentage_change: 0.2
+      crossover:
+        type: random
+    model_weight_catboost:
+      type: float
+      min_value: 0.0
+      max_value: 1.0
+      generation:
+        type: uniform
+      mutation:
+        percentage_change: 0.2
+      crossover:
+        type: random
+    model_weight_svm:
+      type: float
+      min_value: 0.0
+      max_value: 1.0
+      generation:
+        type: uniform
+      mutation:
+        percentage_change: 0.2
+      crossover:
+        type: random
+    imbalance_method:
+      type: enum
+      values:
+        - none
+        - scale_pos_weight
+        - class_weight_balanced
+        - downsample_majority
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    target_positive_ratio:
+      type: enum
+      values: [0.1, 0.2, 0.3, 0.5]
+      generation:
+        type: uniform
+      mutation:
+        type: random
+      crossover:
+        type: error
+    # Revenue sample weighting (only when params.revenue_column is set and revenue_train is present)
+    use_revenue_as_sample_weight:
+      type: bool
+    normalize_sample_weight:
+      type: bool
+    # eval_metric removed: read from params (project-level); does not affect fitness score.
+
+    # Model-specific hyperparameters
+    xgboost:
+      type: dict
+      generation:
+        type: per_item
+        non_required_probability: 0.1
+      mutation:
+        type: random
+        percentage_to_mutate: 0.3
+      crossover:
+        type: per_item_crossover
+      content:
+        n_estimators:
+          type: int
+          min_value: 100
+          max_value: 500
+          generation:
+            type: uniform
+          mutation:
+            step_size: 20
+            percentage_change: 0.2
+          crossover:
+            type: random
+        max_depth:
+          type: int
+          min_value: 3
+          max_value: 10
+          generation:
+            type: uniform
+          mutation:
+            step_size: 1
+            percentage_change: 0.2
+          crossover:
+            type: random
+        learning_rate:
+          type: float
+          min_value: 0.03
+          max_value: 0.3
+          generation: &lr_gen
+            type: uniform
+          mutation: &lr_mut
+            percentage_change: 0.2
+          crossover: &lr_cross
+            type: random
+        subsample:
+          type: float
+          min_value: 0.6
+          max_value: 1.0
+          generation:
+            type: uniform
+          mutation:
+            percentage_change: 0.2
+          crossover:
+            type: random
+        colsample_bytree:
+          type: float
+          min_value: 0.6
+          max_value: 1.0
+          generation:
+            type: uniform
+          mutation:
+            percentage_change: 0.2
+          crossover:
+            type: random
+        reg_alpha:
+          type: float
+          min_value: 0
+          max_value: 10
+          generation:
+            type: uniform
+          mutation:
+            percentage_change: 0.3
+          crossover:
+            type: random
+        reg_lambda:
+          type: float
+          min_value: 0
+          max_value: 10
+          generation:
+            type: uniform
+          mutation:
+            percentage_change: 0.3
+          crossover:
+            type: random
+    
+    logistic_regression:
+      type: dict
+      generation:
+        type: per_item
+        non_required_probability: 0.1
+      mutation:
+        type: random
+        percentage_to_mutate: 0.3
+      crossover:
+        type: per_item_crossover
+      content:
+        C:
+          type: float
+          min_value: 0.001
+          max_value: 100
+          generation: &c_gen
+            type: uniform
+          mutation: &c_mut
+            percentage_change: 0.3
+          crossover: &c_cross
+            type: random
+        # Single enum of valid (penalty, solver) pairs; l1_ratio used only for elasticnet_saga
+        penalty_solver:
+          type: enum
+          values:
+            - l1_liblinear
+            - l1_saga
+            - l2_lbfgs
+            - l2_liblinear
+            - l2_saga
+            - elasticnet_saga
+          generation:
+            type: uniform
+          mutation:
+            type: random
+          crossover:
+            type: error
+        max_iter:
+          type: int
+          min_value: 100
+          max_value: 2000  # Increased from 1000 to allow more iterations for convergence
+          generation:
+            type: uniform
+          mutation:
+            step_size: 50
+            percentage_change: 0.2
+          crossover:
+            type: random
+        # l1_ratio: only used when penalty_solver is elasticnet_saga; ignored otherwise
+        l1_ratio:
+          type: float
+          min_value: 0
+          max_value: 1
+          generation:
+            type: uniform
+          mutation:
+            percentage_change: 0.2
+          crossover:
+            type: random
+    
+    catboost:
+      type: dict
+      generation:
+        type: per_item
+        non_required_probability: 0.1
+      mutation:
+        type: random
+        percentage_to_mutate: 0.3
+      crossover:
+        type: per_item_crossover
+      content:
+        iterations:
+          type: int
+          min_value: 100
+          max_value: 500
+          generation:
+            type: uniform
+          mutation:
+            step_size: 20
+            percentage_change: 0.2
+          crossover:
+            type: random
+        depth:
+          type: int
+          min_value: 3
+          max_value: 10
+          generation:
+            type: uniform
+          mutation:
+            step_size: 1
+            percentage_change: 0.2
+          crossover:
+            type: random
+        learning_rate:
+          type: float
+          min_value: 0.03
+          max_value: 0.3
+          generation: *lr_gen
+          mutation: *lr_mut
+          crossover: *lr_cross
+        l2_leaf_reg:
+          type: float
+          min_value: 1
+          max_value: 10
+          generation:
+            type: uniform
+          mutation:
+            percentage_change: 0.3
+          crossover:
+            type: random
+        random_strength:
+          type: float
+          min_value: 0
+          max_value: 10
+          generation:
+            type: uniform
+          mutation:
+            percentage_change: 0.3
+          crossover:
+            type: random
+        bagging_temperature:
+          type: float
+          min_value: 0
+          max_value: 1
+          generation:
+            type: uniform
+          mutation:
+            percentage_change: 0.2
+          crossover:
+            type: random
+    
+    svm:
+      type: dict
+      generation:
+        type: per_item
+        non_required_probability: 0.1
+      mutation:
+        type: random
+        percentage_to_mutate: 0.3
+      crossover:
+        type: per_item_crossover
+      content:
+        C:
+          type: float
+          min_value: 0.001
+          max_value: 100
+          generation: *c_gen
+          mutation: *c_mut
+          crossover: *c_cross
+        kernel:
+          type: enum
+          values:
+            - linear
+            - rbf
+            - poly
+            - sigmoid
+          generation:
+            type: uniform
+          mutation:
+            type: random
+          crossover:
+            type: error
+        gamma:
+          type: enum
+          values:
+            - scale
+            - auto
+          generation:
+            type: uniform
+          mutation:
+            type: random
+          crossover:
+            type: error
+        degree:
+          type: int
+          min_value: 2
+          max_value: 5
+          generation:
+            type: uniform
+          mutation:
+            step_size: 1
+            percentage_change: 0.2
+          crossover:
+            type: random
+        probability:
+          type: bool

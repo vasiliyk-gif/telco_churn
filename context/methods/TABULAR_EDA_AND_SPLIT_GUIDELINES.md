@@ -3,6 +3,11 @@
 This guide expands lifecycle **Step 3 (EDA and profiling)** and **Step 4 (data split strategy)** for any supervised tabular ML project.  
 It is generalized, but keeps practical lessons learned from real project execution.
 
+> **In this homework (Bank Marketing):**
+> - The course calls the final split the **test set** (`work/exploration/test.csv`); this guide says "holdout test set". Same thing: read once, at the end.
+> - The metric is **campaign profit** (see `PROJECT_BRIEF.md`), not F1 or PR-AUC. Use imbalance-aware *diagnostics* in EDA, but score models in euros.
+> - §4.8 applies: the rows are in date order (`contact_order`), so decide whether a random or a chronological split answers "how will this work next campaign?".
+
 ## Scope
 
 - Problem families: binary classification, multiclass classification, and regression

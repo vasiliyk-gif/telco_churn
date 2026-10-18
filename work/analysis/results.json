@@ -1,0 +1,550 @@
+{
+  "q1_per_generation": [
+    {
+      "generation": 0,
+      "best": 0.235,
+      "mean": 0.2113,
+      "worst": 0.1938,
+      "best_so_far": 0.235
+    },
+    {
+      "generation": 1,
+      "best": 0.2483,
+      "mean": 0.2157,
+      "worst": 0.196,
+      "best_so_far": 0.2483
+    },
+    {
+      "generation": 2,
+      "best": 0.2483,
+      "mean": 0.2221,
+      "worst": 0.1903,
+      "best_so_far": 0.2483
+    },
+    {
+      "generation": 3,
+      "best": 0.2483,
+      "mean": 0.2251,
+      "worst": 0.1591,
+      "best_so_far": 0.2483
+    },
+    {
+      "generation": 4,
+      "best": 0.2483,
+      "mean": 0.2283,
+      "worst": 0.1822,
+      "best_so_far": 0.2483
+    },
+    {
+      "generation": 5,
+      "best": 0.2483,
+      "mean": 0.2225,
+      "worst": 0.1885,
+      "best_so_far": 0.2483
+    },
+    {
+      "generation": 6,
+      "best": 0.2483,
+      "mean": 0.2235,
+      "worst": 0.1717,
+      "best_so_far": 0.2483
+    },
+    {
+      "generation": 7,
+      "best": 0.2483,
+      "mean": 0.2279,
+      "worst": 0.1881,
+      "best_so_far": 0.2483
+    },
+    {
+      "generation": 8,
+      "best": 0.2483,
+      "mean": 0.2285,
+      "worst": 0.1972,
+      "best_so_far": 0.2483
+    },
+    {
+      "generation": 9,
+      "best": 0.2509,
+      "mean": 0.2359,
+      "worst": 0.1942,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 10,
+      "best": 0.2509,
+      "mean": 0.2394,
+      "worst": 0.2319,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 11,
+      "best": 0.2509,
+      "mean": 0.2395,
+      "worst": 0.2288,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 12,
+      "best": 0.2509,
+      "mean": 0.2395,
+      "worst": 0.2282,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 13,
+      "best": 0.2509,
+      "mean": 0.2389,
+      "worst": 0.2108,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 14,
+      "best": 0.2509,
+      "mean": 0.2338,
+      "worst": 0.2108,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 15,
+      "best": 0.2509,
+      "mean": 0.2268,
+      "worst": 0.2108,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 16,
+      "best": 0.2509,
+      "mean": 0.2272,
+      "worst": 0.2007,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 17,
+      "best": 0.2509,
+      "mean": 0.23,
+      "worst": 0.1983,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 18,
+      "best": 0.2509,
+      "mean": 0.2365,
+      "worst": 0.1984,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 19,
+      "best": 0.2509,
+      "mean": 0.232,
+      "worst": 0.2008,
+      "best_so_far": 0.2509
+    },
+    {
+      "generation": 20,
+      "best": 0.2509,
+      "mean": 0.23,
+      "worst": 0.1951,
+      "best_so_far": 0.2509
+    }
+  ],
+  "q2_top10": [
+    {
+      "generation": 20,
+      "score": 0.2509,
+      "scalar.profit_per_1000_mean": 1697.5,
+      "scalar.profit_per_1000_std": 247.8533,
+      "scalar.share_called": 0.1295,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 6,
+      "gene.xgb_n_estimators": 152,
+      "gene.xgb_learning_rate_exponent": -1.7297,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 18,
+      "score": 0.2502,
+      "scalar.profit_per_1000_mean": 1692.5,
+      "scalar.profit_per_1000_std": 224.6316,
+      "scalar.share_called": 0.13,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 6,
+      "gene.xgb_n_estimators": 152,
+      "gene.xgb_learning_rate_exponent": -1.7543,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 12,
+      "score": 0.2487,
+      "scalar.profit_per_1000_mean": 1682.5,
+      "scalar.profit_per_1000_std": 227.8774,
+      "scalar.share_called": 0.1319,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 6,
+      "gene.xgb_n_estimators": 151,
+      "gene.xgb_learning_rate_exponent": -1.7297,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 6,
+      "score": 0.2483,
+      "scalar.profit_per_1000_mean": 1680.0,
+      "scalar.profit_per_1000_std": 212.7719,
+      "scalar.share_called": 0.1304,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 6,
+      "gene.xgb_n_estimators": 162,
+      "gene.xgb_learning_rate_exponent": -1.8532,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 3,
+      "score": 0.2482,
+      "scalar.profit_per_1000_mean": 1678.75,
+      "scalar.profit_per_1000_std": 220.7091,
+      "scalar.share_called": 0.1349,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 6,
+      "gene.xgb_n_estimators": 163,
+      "gene.xgb_learning_rate_exponent": -1.8532,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 20,
+      "score": 0.248,
+      "scalar.profit_per_1000_mean": 1677.5,
+      "scalar.profit_per_1000_std": 237.717,
+      "scalar.share_called": 0.135,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 6,
+      "gene.xgb_n_estimators": 153,
+      "gene.xgb_learning_rate_exponent": -1.7485,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 12,
+      "score": 0.2465,
+      "scalar.profit_per_1000_mean": 1667.5,
+      "scalar.profit_per_1000_std": 172.9523,
+      "scalar.share_called": 0.1308,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 6,
+      "gene.xgb_n_estimators": 155,
+      "gene.xgb_learning_rate_exponent": -1.7998,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 13,
+      "score": 0.2463,
+      "scalar.profit_per_1000_mean": 1666.25,
+      "scalar.profit_per_1000_std": 212.5588,
+      "scalar.share_called": 0.1449,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 6,
+      "gene.xgb_n_estimators": 152,
+      "gene.xgb_learning_rate_exponent": -1.746,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 4,
+      "score": 0.2461,
+      "scalar.profit_per_1000_mean": 1665.0,
+      "scalar.profit_per_1000_std": 192.0531,
+      "scalar.share_called": 0.1616,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 5,
+      "gene.xgb_n_estimators": 162,
+      "gene.xgb_learning_rate_exponent": -1.8532,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    },
+    {
+      "generation": 18,
+      "score": 0.2461,
+      "scalar.profit_per_1000_mean": 1665.0,
+      "scalar.profit_per_1000_std": 273.593,
+      "scalar.share_called": 0.1502,
+      "gene.model_family": "xgboost",
+      "gene.xgb_max_depth": 5,
+      "gene.xgb_n_estimators": 154,
+      "gene.xgb_learning_rate_exponent": -1.7386,
+      "gene.class_weight_balanced": false,
+      "gene.pdays_flag": true
+    }
+  ],
+  "q2_gap_to_champion_eur": {
+    "#2": 5.0,
+    "#5": 18.75,
+    "#10": 32.5
+  },
+  "q3_one_flip": {
+    "champion": {
+      "profit_per_1000_mean": 1697.5,
+      "change_vs_champion": 0.0,
+      "share_called": 0.13,
+      "per_fold": [
+        1693.8,
+        1856.2,
+        1487.5,
+        2068.8,
+        1381.2
+      ]
+    },
+    "pdays_flag off": {
+      "profit_per_1000_mean": 1585.0,
+      "change_vs_champion": -112.5,
+      "share_called": 0.138,
+      "per_fold": [
+        1725.0,
+        1637.5,
+        1531.2,
+        1850.0,
+        1181.2
+      ]
+    },
+    "class weight on": {
+      "profit_per_1000_mean": 1558.8,
+      "change_vs_champion": -138.7,
+      "share_called": 0.125,
+      "per_fold": [
+        1550.0,
+        1718.8,
+        1518.8,
+        1631.2,
+        1375.0
+      ]
+    },
+    "depth 6 -> 4": {
+      "profit_per_1000_mean": 1658.8,
+      "change_vs_champion": -38.7,
+      "share_called": 0.143,
+      "per_fold": [
+        1637.5,
+        1787.5,
+        1431.2,
+        2000.0,
+        1437.5
+      ]
+    },
+    "depth 6 -> 8 (outside the range)": {
+      "profit_per_1000_mean": 1587.5,
+      "change_vs_champion": -110.0,
+      "share_called": 0.162,
+      "per_fold": [
+        1543.8,
+        1787.5,
+        1393.8,
+        1881.2,
+        1331.2
+      ]
+    },
+    "family -> LR (C = 1)": {
+      "profit_per_1000_mean": 1481.2,
+      "change_vs_champion": -216.3,
+      "share_called": 0.116,
+      "per_fold": [
+        1443.8,
+        1856.2,
+        1168.8,
+        1600.0,
+        1337.5
+      ]
+    }
+  },
+  "q4_fresh_folds": {
+    "search_seed42": {
+      "champion": 1697.5,
+      "baseline": 1488.75
+    },
+    "fresh_per_seed": {
+      "champion": {
+        "1": 1688.75,
+        "2": 1698.75,
+        "3": 1738.75,
+        "4": 1716.25,
+        "5": 1763.75
+      },
+      "baseline": {
+        "1": 1546.25,
+        "2": 1573.75,
+        "3": 1576.25,
+        "4": 1515.0,
+        "5": 1502.5
+      }
+    },
+    "fresh_mean": {
+      "champion": 1721.25,
+      "baseline": 1542.75
+    },
+    "fresh_gain_per_seed": [
+      142.5,
+      125.0,
+      162.5,
+      201.2,
+      261.2
+    ],
+    "fresh_gain_mean": 178.5,
+    "fresh_gain_std": 48.53735674714889
+  },
+  "q5_money": {
+    "per_10000_clients": {
+      "champion": {
+        "calls": 1295,
+        "subscriptions": 428,
+        "profit_eur": 16975
+      },
+      "baseline": {
+        "calls": 1180,
+        "subscriptions": 381,
+        "profit_eur": 14888
+      },
+      "call_everyone": {
+        "calls": 10000,
+        "subscriptions": 1128,
+        "profit_eur": -21075
+      }
+    },
+    "call_list_profile": {
+      "poutcome": {
+        "nonexistent": {
+          "share_of_called": 0.598,
+          "share_of_all": 0.864
+        },
+        "success": {
+          "share_of_called": 0.256,
+          "share_of_all": 0.033
+        },
+        "failure": {
+          "share_of_called": 0.146,
+          "share_of_all": 0.103
+        }
+      },
+      "contact": {
+        "cellular": {
+          "share_of_called": 0.966,
+          "share_of_all": 0.633
+        },
+        "telephone": {
+          "share_of_called": 0.034,
+          "share_of_all": 0.367
+        }
+      },
+      "job": {
+        "admin.": {
+          "share_of_called": 0.281,
+          "share_of_all": 0.252
+        },
+        "retired": {
+          "share_of_called": 0.176,
+          "share_of_all": 0.042
+        },
+        "student": {
+          "share_of_called": 0.114,
+          "share_of_all": 0.021
+        },
+        "technician": {
+          "share_of_called": 0.099,
+          "share_of_all": 0.161
+        },
+        "blue-collar": {
+          "share_of_called": 0.078,
+          "share_of_all": 0.224
+        },
+        "management": {
+          "share_of_called": 0.074,
+          "share_of_all": 0.07
+        }
+      },
+      "age": {
+        "<=30": {
+          "share_of_called": 0.375,
+          "share_of_all": 0.178
+        },
+        "31-40": {
+          "share_of_called": 0.155,
+          "share_of_all": 0.403
+        },
+        "41-50": {
+          "share_of_called": 0.045,
+          "share_of_all": 0.243
+        },
+        "51-60": {
+          "share_of_called": 0.263,
+          "share_of_all": 0.154
+        },
+        "60+": {
+          "share_of_called": 0.162,
+          "share_of_all": 0.022
+        }
+      },
+      "subscription_rate_of_called": 0.3301158301158301
+    },
+    "sensitivity": {
+      "cost 10, value 70": {
+        "champion": 1697.5,
+        "baseline": 1488.8,
+        "gain": 208.8,
+        "champion_wins_folds": 4,
+        "champion_share": 0.13
+      },
+      "cost 8, value 70": {
+        "champion": 2071.5,
+        "baseline": 1970.2,
+        "gain": 101.2,
+        "champion_wins_folds": 3,
+        "champion_share": 0.303
+      },
+      "cost 12, value 70": {
+        "champion": 1418.5,
+        "baseline": 1361.5,
+        "gain": 57.0,
+        "champion_wins_folds": 3,
+        "champion_share": 0.106
+      },
+      "cost 10, value 50": {
+        "champion": 906.2,
+        "baseline": 897.5,
+        "gain": 8.8,
+        "champion_wins_folds": 3,
+        "champion_share": 0.086
+      },
+      "cost 10, value 90": {
+        "champion": 2788.8,
+        "baseline": 2653.8,
+        "gain": 135.0,
+        "champion_wins_folds": 2,
+        "champion_share": 0.402
+      }
+    },
+    "share_per_fold": {
+      "share": [
+        0.154,
+        0.13,
+        0.096,
+        0.148,
+        0.12
+      ],
+      "oracle_share": [
+        0.093,
+        0.094,
+        0.102,
+        0.148,
+        0.142
+      ]
+    },
+    "calibration_baseline": {
+      "band": "0.12-0.17",
+      "n_client_fold_pairs": 7687,
+      "mean_predicted": 0.14050259098686346,
+      "actual_rate": 0.12995967217379992
+    }
+  }
+}

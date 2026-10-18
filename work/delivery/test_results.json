@@ -1,0 +1,73 @@
+{
+  "data": "work/exploration/test.csv, read once",
+  "n_test": 2000,
+  "subscribers": 225,
+  "champion_genes": {
+    "model_family": "xgboost",
+    "lr_C_exponent": -0.8286092413843555,
+    "xgb_max_depth": 6,
+    "xgb_n_estimators": 152,
+    "xgb_learning_rate_exponent": -1.7297092805126622,
+    "class_weight_balanced": false,
+    "pdays_flag": true
+  },
+  "baseline_genes": {
+    "model_family": "logistic_regression",
+    "lr_C_exponent": 0.0,
+    "xgb_max_depth": 6,
+    "xgb_n_estimators": 152,
+    "xgb_learning_rate_exponent": -1.7297092805126622,
+    "class_weight_balanced": false,
+    "pdays_flag": false
+  },
+  "f1_champion_genes": {
+    "model_family": "logistic_regression",
+    "lr_C_exponent": -1.5363224767938373,
+    "xgb_max_depth": 2,
+    "xgb_n_estimators": 279,
+    "xgb_learning_rate_exponent": -1.545923716273222,
+    "class_weight_balanced": false,
+    "pdays_flag": true
+  },
+  "policies": [
+    {
+      "policy": "call everyone",
+      "profit_per_1000": -2125.0,
+      "share_called": 1.0,
+      "calls": 2000,
+      "subscribers_called": 225
+    },
+    {
+      "policy": "simple rule: poutcome == \"success\"",
+      "profit_per_1000": 900.0,
+      "share_called": 0.0255,
+      "calls": 51,
+      "subscribers_called": 33
+    },
+    {
+      "policy": "LR baseline",
+      "profit_per_1000": 1760.0,
+      "share_called": 0.0795,
+      "calls": 159,
+      "subscribers_called": 73,
+      "share_picked_on_train": 0.0796
+    },
+    {
+      "policy": "Earth champion (run1, profit fitness)",
+      "profit_per_1000": 1725.0,
+      "share_called": 0.202,
+      "calls": 404,
+      "subscribers_called": 107,
+      "share_picked_on_train": 0.2021
+    },
+    {
+      "policy": "F1 champion (run2)",
+      "profit_per_1000": 1675.0,
+      "share_called": 0.13,
+      "calls": 260,
+      "subscribers_called": 85,
+      "share_picked_on_train": 0.13
+    }
+  ],
+  "champion_minus_baseline": -35.0
+}

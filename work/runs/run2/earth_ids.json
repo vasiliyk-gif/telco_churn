@@ -1,0 +1,30 @@
+{
+  "run_name": "run2",
+  "earth_name": "hw-run2-1792332632",
+  "dataset_id": "53d17c48-1984-4ac4-9f16-7f8908e3e728",
+  "project_id": "547134df2d534bc59467ecf16de60041",
+  "experiment_id": "9d9fa78b9b554480ab67da7c5105d8c7",
+  "train": "train.csv",
+  "assets_uploaded": {},
+  "chromosome": "chromosome.yaml",
+  "fitness": "fitness.py",
+  "settings": {
+    "pop": 10,
+    "units": 5,
+    "fitness_cpus": 1,
+    "concurrency": 5,
+    "minutes": 15,
+    "maximize": true,
+    "elite_pct": 0.05,
+    "mutation_pct": 0.15,
+    "unique_mutation_pct": 0,
+    "recalculate_elite": false,
+    "max_stagnation_loops": 5,
+    "max_drifts": 3,
+    "steady_threshold": 0.001,
+    "generation_start_steady": 10,
+    "look_back": 11,
+    "generate_final_mutations": false,
+    "enable_genetic_drift": true
+  }
+}

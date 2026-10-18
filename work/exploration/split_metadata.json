@@ -1,0 +1,14 @@
+{
+  "source": "data/bank_10k.csv",
+  "method": "stratified random (on y)",
+  "test_size": 0.2,
+  "seed": 42,
+  "date": "2026-10-16",
+  "n_source": 10000,
+  "n_train": 8000,
+  "n_test": 2000,
+  "rate_source": 0.1127,
+  "rate_train": 0.11275,
+  "rate_test": 0.1125,
+  "note": "Rows drift strongly over contact_order (see EDA \u00a76); a random split mixes periods, so test profit is likely optimistic for a future campaign."
+}

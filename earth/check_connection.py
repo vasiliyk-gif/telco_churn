@@ -4,7 +4,7 @@ Usage:
     python earth/check_connection.py
 
 Requires EARTH_USER / EARTH_PASS in .env (or the environment).
-Uses auth(password_only=True) so a bad password exits instead of device code.
+A bad or missing password exits with a clear message.
 """
 
 from __future__ import annotations

@@ -1,3 +1,13 @@
+> **Source:** the Earth binary-classifier template. Read "template" as "your
+> `fitness.py` and `chromosome.yaml`". Use it as a checklist in Step 5 (Package
+> and validate), before your first Earth run.
+>
+> In this lab the market rule (2–20% seller flexibility, 5% costs, the $500k cap, the 0.5 risk
+> weight) and the three past years are fixed in `fitness.py` on purpose: no gene may change them. Unlike
+> the homework, the **pricing policy is a gene block**: what to offer is the decision Earth optimises.
+> The classifier-specific parts below (probabilities, thresholds, class imbalance) do not apply to this
+> regression problem; the rules about genes, determinism and the fitness contract do.
+
 # Known Constraints – Binary Classifier Template
 
 These are structural constraints discovered during development.

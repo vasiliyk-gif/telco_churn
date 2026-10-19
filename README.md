@@ -1,182 +1,207 @@
-# Earth DS Workshop — Churn Prediction
+# Earth Lab 2 — Instant offers on Ames homes
 
-## What you will build
+> **Before you start:** read [PROJECT_BRIEF.md](PROJECT_BRIEF.md) (10 minutes). You run the whole
+> pathway on a new problem: frame it, look at the data, score the classic approach, let Earth evolve a
+> better one, analyse the run, and at the end score your offers on what the 2010 homes really sold for.
+> The work is for you: nothing is handed in or graded.
+>
+> **Time:** 10:40 (after the demo) to 15:30; the steps below take about 3 hours of work, and you may keep going through
+> the break. At 15:30 we stop for the course wrap-up. Not finished? Finish after class; the 2010
+> prices stay in the repository after the reveal.
 
-A binary customer churn classifier, optimized for validation F1 with Earth GA,
-then scored once on an untouched holdout. The ML problem stays simple so you can
-practice the full DS pathway with a coding agent.
+## The lab
 
-## What you will learn
+An iBuyer makes cash offers on listed homes and resells the ones it buys. Offer too much and sellers
+accept, and you lose money. Offer too little and nobody sells. The classic data-science answer is: build
+the most accurate price model, then subtract one flat margin. Today you test whether Earth can do better
+by evolving **the price model and the pricing policy together**, scored directly on risk-adjusted
+profit.
 
-- How to partner with a coding agent on a DS project without giving up reasoning
-- A lightweight DS delivery path: Frame → Explore → Baseline → Formulate → Earth → Validate → Deliver
-- Earth UI and Earth API as the optimization stage
+You own the decisions. Your coding agent writes code with you; prompts are in
+[AGENT_PROMPTS.md](AGENT_PROMPTS.md). Stuck? See [HINTS.md](HINTS.md).
 
-Detailed practices: [context/workshop_pathway.md](context/workshop_pathway.md) and
-[context/methods/PROJECT_DELIVERY_PRACTICES_ONE_PAGER.md](context/methods/PROJECT_DELIVERY_PRACTICES_ONE_PAGER.md).
+Every step has **Read first**, **Do**, **Deliver** (what must exist under `work/`), and **Done when**.
 
-Project framing: [context/project_context.md](context/project_context.md).
-
-Workshop tags and teacher vs student updates:
-[context/WORKSHOP_STATE_MANAGEMENT.md](context/WORKSHOP_STATE_MANAGEMENT.md).
-
-## Repository structure
+## Repository
 
 ```text
-data/                   Excel tables + data_context.md
-context/                Project context, pathway, state management, DS practices
-context/template_churn/ Reference chromosome/fitness examples (not runtime)
-earth/                  Earth REST client + connection check
-work/                   Your work (empty at start except framing.md)
+PROJECT_BRIEF.md              The business, the market rule, the decisions you make
+EXPERIMENT_ANALYSIS_GUIDE.md  Step 7: how to analyse the Earth run
+HINTS.md, AGENT_PROMPTS.md    Support material and prompts for your coding agent
+data/                         ames_history.csv (2006-2009, with prices), ames_2010_listings.csv (no prices)
+earth/ibuyer_market.py        The market rule (fixed)
+earth/classic_baseline.py     Step 3: the classic pipeline
+earth/fitness_skeleton.py     Step 5: your fitness starts here
+earth/make_offers.py          Step 8: champion -> offers on the 2010 listings
+earth/score_2010.py           Step 8: the reveal, once the teacher releases the 2010 prices
+earth/                        Earth tools: check_local, validate_chromosome, run_search, fetch_history, compare_runs
+context/                      Pathway, methods, chromosome philosophy
+work/                         Your work (templates to fill in)
 ```
 
-Start from tag `workshop-1-start-v3` (this tree). Do not check out the solution
-tag during the exercise.
+## Step 0 — Set up (10 min)
 
-## Prerequisites
-
-- Python 3.12
-- An Earth account (`EARTH_USER` / `EARTH_PASS`)
-
-## Setup
-
-### Student checkout
+Use your homework environment, on this branch:
 
 ```bash
-git checkout workshop-1-start-v3
-python3.12 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env   # set EARTH_USER / EARTH_PASS
-python earth/check_connection.py
-```
-
-Use Python 3.12. `.venv/` is local and is not committed.
-
-`python --version` should print Python 3.12.x after activate.
-
-If `python3.12` is not on your `PATH`, create the environment with a Python 3.12
-interpreter you already have. For a pyenv install of 3.12.3:
-
-```bash
-~/.pyenv/versions/3.12.3/bin/python -m venv .venv
+git fetch origin && git checkout s5
 source .venv/bin/activate
-```
-
-On Windows, activate with `.venv\Scripts\activate`.
-
-## Verify Earth connection
-
-```bash
+pip install -r requirements.txt
 python earth/check_connection.py
+cp data/ames_history.csv work/exploration/train.csv
 ```
 
-Expected: authentication succeeds, the template GET returns 200, and
-`running-count` prints. No dataset or experiment is created.
+`work/exploration/train.csv` is the file the Earth tools upload. There is no `test.csv` today: the test
+is the 2010 listings, and their prices are not in this repository.
 
-## Project pathway
+**Done when:** the connection check prints `Connection check OK.`
 
-Work under `work/`. Ask your coding agent to implement each step after you make
-the DS decisions. Read the code, run it, then continue.
+## Step 1 — Frame (15 min)
 
-### 1. Frame
+**Read first:** [PROJECT_BRIEF.md](PROJECT_BRIEF.md).
 
-Read [context/project_context.md](context/project_context.md). Fill
-[work/framing.md](work/framing.md): target, metric, feature boundary, workshop
-data assumption.
+**Do:** write the business question, the decision, the money (when does one purchase make or lose
+money?), why losses count extra, and what success means.
 
-### 2. Explore
+**Deliver:** `work/framing.md`.
 
-Build a short loader under `work/exploration/`. Join the five-table module.
-Check shape, target balance, missingness, types, and exclusions. Freeze
-`train.csv` and `holdout.csv`. There is another conflicting consolidated extract
-(`Telco_customer_churn.xlsx`); it is deliberately not our modeling source.
+**Done when:** success is written as numbers, e.g. "on the 2010 listings, at least $X more risk-adjusted
+profit than the classic baseline" (you pick X and say why).
 
-### 3. Baseline
+## Step 2 — Data and evaluation (20 min)
 
-Implement a fixed sklearn logistic pipeline under `work/modeling/`. Score F1 on
-`validation` cut from `train.csv`. Do not read `holdout.csv`.
+**Read first:** [data/data_dictionary.md](data/data_dictionary.md); [context/pathway.md](context/pathway.md).
 
-### 4. Formulate
+**Do:**
+- Quick EDA on `work/exploration/train.csv`: price by year, by `Overall Qual`, by `Year Built`, by
+  neighbourhood. How many homes sell above $300k?
+- **Feature boundary:** which columns would you *not* have when a home is listed? Write a reason for each.
+- The fitness scores on **three past years**: fit on years before Y, offer on Y (2007, 2008, 2009).
+  Write why that is closer to the real question than a random split.
 
-Write what Earth may change and what stays fixed. Read
-[context/template_churn/](context/template_churn/) as reference, then create a
-**reduced** chromosome under `work/modeling/`.
+**Deliver:** the feature boundary in `work/framing.md`; the evaluation in `work/design.md`.
 
-### 5. Package
+**Done when:** someone could explain from `design.md` how a policy is scored, and what the 2010 test is.
 
-Write `FitnessClass` that scores F1 on `validation` from the uploaded train CSV.
-Smoke-test locally. Validate the chromosome:
+## Step 3 — The classic baseline (15 min)
+
+**Do:**
 
 ```bash
-python earth/validate_chromosome.py work/modeling/chromosome.yaml
+python earth/classic_baseline.py
 ```
 
-### 6. Earth
+It picks the most accurate price model (smallest RMSE) on the three past years, then the one flat margin
+that makes the most risk-adjusted profit on the same years, and writes `work/baseline/`, including
+offers on the 2010 listings.
 
-Launch through the API (`earth/run_search.py` once you have it). Watch generations
-in the Earth UI. Save the experiment id and champion chromosome.
+**Deliver:** the baseline numbers in `work/design.md` (RMSE, best margin, risk-adjusted profit per
+listing, share of listings bought), and your answer to **Gate 3**: what is left to gain, and where do
+you think the classic approach loses money?
 
-### 7. Validate
+**Done when:** you can say which homes a flat margin treats badly, and why.
 
-Refit baseline and champion on all of `train.csv`. Score both once on
-`holdout.csv`. Search fitness and holdout F1 are different numbers.
+## Step 4 — Formulate the search (25 min)
 
-### 8. Deliver
+**Read first:** [context/template/CHROMOSOME_PHILOSOPHY.md](context/template/CHROMOSOME_PHILOSOPHY.md);
+[earth/context/CHROMOSOME_GUIDE.md](earth/context/CHROMOSOME_GUIDE.md) for YAML syntax.
 
-Write `work/delivery/report.md` with framing, baseline, formulation, Earth ids,
-champion config, holdout metrics, a conclusion, and:
+**Do:** decide what Earth may change, in two parts:
+- **Valuation** (given in the skeleton, you choose the ranges): blend weight between ridge and XGBoost,
+  ridge strength, XGBoost settings, log price, dropping houses over 4,000 sq ft from training, training
+  XGBoost for a lower quantile instead of the mean, feature-group switches.
+- **Pricing policy** (you design it): at least a base margin. Then what a smart buyer would add: a margin
+  that grows when the two models disagree, margins by quality, age or price tier, when not to offer.
 
-> If you ran a second optimization experiment, what additional decision would you
-> allow Earth to evolve?
+Fixed: the market rule, the three past years, the feature boundary, the $500k cap.
 
-## Working with your coding agent
+**Deliver:** `work/optimization/formulation.md`: every gene, its range, and why.
 
-You own problem meaning, feature boundaries, the metric, chromosome vs fixed
-choices, and whether the champion generalized. The agent may inspect files,
-implement code, run checks, and draft documentation. See
-[context/workshop_pathway.md](context/workshop_pathway.md).
+**Done when:** for every policy gene you can say which homes it changes the offer for.
 
-## Expected outputs
+## Step 5 — Package and validate (30 min)
 
-| After | Under `work/` |
-|-------|----------------|
-| Frame | Completed `framing.md` |
-| Explore | `exploration/train.csv`, `exploration/holdout.csv`, split metadata |
-| Baseline | Modeling scripts + validation metrics |
-| Formulate / Package | `modeling/chromosome.yaml`, `modeling/fitness.py`, `modeling/pipeline.py` |
-| Earth | Experiment id + champion JSON |
-| Validate / Deliver | Holdout comparison + `delivery/report.md` |
+**Read first:** [earth/context/GA_CONTRACT.md](earth/context/GA_CONTRACT.md); [HINTS.md](HINTS.md), Step 5.
+
+**Do:**
+
+```bash
+cp earth/fitness_skeleton.py work/optimization/fitness.py
+```
+
+Write `offer_prices()` (your policy) and the score in `work/optimization/fitness.py`, and
+`work/optimization/chromosome.yaml` (the valuation block is in HINTS.md; add your `policy` block). Then:
+
+```bash
+python earth/check_local.py
+python earth/validate_chromosome.py work/optimization/chromosome.yaml
+```
+
+One fitness call fits two models on three years: about 2–4 s on a laptop.
+
+**Deliver:** `fitness.py`, `chromosome.yaml`, the run estimate in `formulation.md`.
+
+**Done when:** both checks pass.
+
+## Step 6 — Run the search (20 min, 15 of them waiting)
+
+**Do:**
+
+```bash
+python earth/run_search.py --name run1
+```
+
+Defaults for today: population **30**, **15** workers × 1 CPU, 15-minute cap. Don't shrink the
+population: with 10 the search stops too early on this many genes (we tested it). While it runs, write
+your prediction in `work/run_notes.md`: which policy genes will matter?
+
+If the run is still going after 25 minutes, tell the teacher (Earth's time cap is not always enforced).
+
+**Deliver:** `work/runs/run1/`, a line in `work/run_notes.md`.
+
+**Done when:** the champion is saved and you compared its fitness with the classic baseline's.
+
+## Step 7 — Analyse the run (25 min)
+
+**Read first:** [EXPERIMENT_ANALYSIS_GUIDE.md](EXPERIMENT_ANALYSIS_GUIDE.md), questions 1–4.
+
+```bash
+python earth/fetch_history.py --name run1
+```
+
+**Deliver:** the analysis sections of `work/delivery/report.md`.
+
+**Done when:** checklist items 1–4 of the guide are ticked.
+
+## Step 8 — Make offers, then the reveal (20 min)
+
+**Do:**
+
+```bash
+python earth/make_offers.py --name run1
+```
+
+Write your prediction for 2010 in `work/delivery/report.md` first. When the teacher releases the 2010
+prices (about 14:50):
+
+```bash
+git pull
+python earth/score_2010.py
+```
+
+It scores your offers and the classic offers on the real 2010 prices with the same market rule. Run it
+once: tuning on these numbers would turn the test into training data. We then compare results as a class.
+
+**Deliver:** `work/delivery/report.md`, complete: the 2010 result table, your verdict against the
+success criterion, and your answer to: *The champion's price model is about as accurate as the classic
+one. Where did the money come from?*
 
 ## Troubleshooting
 
-- Login name is often the part before `@` in `EARTH_USER`
-- Fitness `score` must be finite and strictly positive (`max(f1, 1e-9)`)
-- Enum genes need `crossover: {type: error}`
-- Upload only `train.csv` to Earth — never `holdout.csv`
-- Do not model from the consolidated workbook
-- Do not run `python earth/earth_client.py` (legacy MOXO `__main__`)
-
-## Workshop state management
-
-Full rules for humans and agents (teacher mode vs student mode):
-[context/WORKSHOP_STATE_MANAGEMENT.md](context/WORKSHOP_STATE_MANAGEMENT.md).
-
-`workshop-1-start-v3` is the tree students receive. `workshop-1-solution-v3` is
-the verified pathway. Leave the solution tag facilitator-only until the workshop
-is over. Do not merge it into `main`.
-
-```bash
-# create the workshop starting point
-git tag -a workshop-1-start-v3 -m "Earth Workshop 1 student starting state"
-
-# continue implementing / testing the complete pathway
-git switch -c facilitator/solution workshop-1-start-v3
-# exploration → baseline → formulation → Earth packaging
-# → Earth run → champion validation → delivery
-
-# after successful end-to-end validation
-git tag -a workshop-1-solution-v3 -m "Earth Workshop 1 verified solution"
-
-# before class, repeat the student path from a clean tree
-git worktree add ../telco_churn_student workshop-1-start-v3
-```
+- `Local check FAILED`: read the line above it. Usually a gene in the YAML that the fitness does not
+  read (or the reverse), or `offer_prices` still raising `NotImplementedError`.
+- Bool genes take no `generation` / `mutation` / `crossover` operators; enum genes need
+  `crossover: {type: error}`. The validator says which.
+- Fitness score must be finite and > 0 (`max(score, 1e-9)`).
+- Your score on Earth can differ from your laptop by about 1% (library versions on the workers).
+- `already exists. Pick a new --name`: each run needs its own name.

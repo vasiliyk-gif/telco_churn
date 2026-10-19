@@ -1,7 +1,7 @@
-"""Earth REST client for moxo clustering GA experiments.
+"""Earth REST client: auth, dataset upload, project clone, launch, poll, abort.
 
 Adapted from EARTH_AGENT_GUIDE.md.
-Usage: see earth/README.md or run as a script (example at the bottom).
+Usage: see earth/README.md; earth/run_search.py runs the full search.
 
 Set credentials in a .env file at the repo root:
     EARTH_USER=you@evolution.inc
@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 import time
 from copy import deepcopy
 from pathlib import Path
@@ -23,13 +22,10 @@ import yaml
 # ── Constants ──────────────────────────────────────────────────────────────────
 
 BASE = "https://earth.evolution.inc"
-# Legacy Keycloak path is obsolete (SPA catch-all). Prefer /api/auth/login, then
-# ZITADEL OIDC device code via /.well-known/openid-configuration.
-OIDC_CLIENT_ID = "386815233072662251"
-OIDC_SCOPES = "openid profile email offline_access"
 TOKEN_CACHE_PATH = Path(__file__).resolve().parent.parent / ".earth_token_cache.json"
 
 # Clone any existing valid project to inherit a well-formed GA configuration.
+# (Earth's "Churn Prediction" template; its chromosome and fitness are replaced at launch.)
 CHURN_TEMPLATE_ID = "fb775bea36244a829cd79f5d7364016b"
 
 BASIC_COMPUTE_PROFILE = {
@@ -56,25 +52,7 @@ except ImportError:
     pass  # python-dotenv optional; os.environ already set in CI/prod
 
 
-def _env(key: str) -> str:
-    """Read a required credential from environment. Fail fast if missing."""
-    value = os.environ.get(key)
-    if value:
-        return value
-    sys.exit(
-        f"Missing credential '{key}'. "
-        "Copy .env.example to .env and set the value, "
-        "or export as an environment variable."
-    )
-
-
 # ── Auth ───────────────────────────────────────────────────────────────────────
-
-def _oidc_metadata() -> dict:
-    resp = requests.get(f"{BASE}/.well-known/openid-configuration", timeout=30)
-    resp.raise_for_status()
-    return resp.json()
-
 
 def _org_id_from_token(token: str) -> str | None:
     """Extract Earth org id from JWT claims when present."""
@@ -191,74 +169,15 @@ def _auth_password_api(session: requests.Session) -> str | None:
     return None
 
 
-def _auth_device_code(session: requests.Session) -> str:
-    """ZITADEL OIDC device authorization flow (interactive once per cache lifetime)."""
-    meta = _oidc_metadata()
-    device_url = meta["device_authorization_endpoint"]
-    token_url = meta["token_endpoint"]
-    start = session.post(
-        device_url,
-        data={"client_id": OIDC_CLIENT_ID, "scope": OIDC_SCOPES},
-        timeout=60,
-    )
-    if not start.ok:
-        raise RuntimeError(
-            f"Device authorization failed: HTTP {start.status_code} {start.text[:300]!r}"
-        )
-    payload = start.json()
-    print(
-        "\nEarth login required (OIDC device code).\n"
-        f"  1. Open: {payload.get('verification_uri_complete') or payload.get('verification_uri')}\n"
-        f"  2. Confirm code: {payload.get('user_code')}\n"
-        "Waiting for authorization...\n",
-        flush=True,
-    )
-    interval = max(int(payload.get("interval") or 5), 2)
-    deadline = time.time() + int(payload.get("expires_in") or 300)
-    device_code = payload["device_code"]
-    while time.time() < deadline:
-        time.sleep(interval)
-        tok = session.post(
-            token_url,
-            data={
-                "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
-                "device_code": device_code,
-                "client_id": OIDC_CLIENT_ID,
-            },
-            timeout=60,
-        )
-        if tok.status_code == 200:
-            data = tok.json()
-            token = data.get("access_token") or data.get("id_token")
-            if not token:
-                raise RuntimeError(f"Device token response missing token; keys={list(data)}")
-            _save_token_cache(data)
-            print("Device authorization successful.", flush=True)
-            return token
-        try:
-            err = tok.json()
-        except ValueError:
-            err = {"error": tok.text[:200]}
-        error = err.get("error")
-        if error in ("authorization_pending", "slow_down"):
-            if error == "slow_down":
-                interval += 2
-            continue
-        raise RuntimeError(f"Device token error: {err}")
-    raise RuntimeError("Device authorization timed out")
-
-
 def auth(*, password_only: bool = False) -> tuple[requests.Session, dict]:
     """Authenticate and return (session, headers).
 
     Order:
       1. Cached access token (``.earth_token_cache.json``)
       2. ``POST /api/auth/login`` with ``EARTH_USER`` / ``EARTH_PASS``
-      3. OIDC device-code flow (ZITADEL) using the Earth web client id
 
-    When ``password_only`` is True, step 3 is skipped. Missing or rejected
-    credentials raise ``RuntimeError`` instead of opening device authorization.
-    Workshop scripts should pass ``password_only=True``.
+    Missing or rejected credentials raise ``RuntimeError``. ``password_only`` is
+    kept for compatibility; password login is the only flow.
     """
     session = requests.Session()
     cached = _load_cached_token()
@@ -269,51 +188,10 @@ def auth(*, password_only: bool = False) -> tuple[requests.Session, dict]:
     if token:
         return session, _headers_from_token(token)
 
-    if password_only:
-        raise RuntimeError(
-            "Password login failed or EARTH_USER / EARTH_PASS are missing. "
-            "Device-code fallback is disabled (password_only=True). "
-            "Fix credentials in .env and retry."
-        )
-
-    token = _auth_device_code(session)
-    return session, _headers_from_token(token)
-
-
-# ── Dataset lookup ─────────────────────────────────────────────────────────────
-
-def find_dataset_by_id(session: requests.Session, headers: dict, dataset_id: str) -> bool:
-    """Return True if *dataset_id* still exists in the organisation's dataset list.
-
-    First tries a direct ``GET /api/datasets/<id>`` (fast O(1) lookup). If the
-    server returns 404 that dataset is gone. For any other non-200 status the
-    function falls back to ``GET /api/datasets/by-organization`` and scans the
-    list — this handles servers where the direct endpoint is not supported.
-    """
-    # Fast path: direct lookup
-    try:
-        resp = session.get(f"{BASE}/api/datasets/{dataset_id}", headers=headers, timeout=30)
-        if resp.status_code == 200:
-            return True
-        if resp.status_code == 404:
-            return False
-    except Exception:
-        pass  # network glitch → fall through to list lookup
-
-    # Fallback: list all organisation datasets and scan
-    try:
-        resp = session.get(f"{BASE}/api/datasets/by-organization", headers=headers, timeout=60)
-        if not resp.ok:
-            return False
-        datasets = resp.json()
-        if isinstance(datasets, list):
-            return any(
-                str(ds.get("id") or ds.get("_id") or ds.get("dataset_id", "")) == str(dataset_id)
-                for ds in datasets
-            )
-    except Exception:
-        pass
-    return False
+    raise RuntimeError(
+        "Password login failed or EARTH_USER / EARTH_PASS are missing. "
+        "Fix credentials in .env and retry."
+    )
 
 
 # ── Dataset upload ─────────────────────────────────────────────────────────────
@@ -404,6 +282,7 @@ def _ga_config(
     look_back: int = 8,
     generate_final_mutations: bool = False,
     enable_genetic_drift: bool = True,
+    concurrency: int = 32,
 ) -> dict:
     if enable_genetic_drift:
         drift_names = [
@@ -459,7 +338,7 @@ def _ga_config(
             "is_maximum_problem":       bool(maximize),
             "generate_final_mutations": generate_final_mutations,
         },
-        "ai2": {"output": {"concurrency": 32, "cpu_cores": 1}},
+        "ai2": {"output": {"concurrency": concurrency, "cpu_cores": 1}},
     }
 
 
@@ -471,8 +350,6 @@ def launch(
     project_id:   str,
     dataset_id:   str,
     chromo_path:  str   = "earth/chromosome.yaml",
-    fitness_path: str   = "earth/fitness.py",
-    config_path:  str   = "earth/moxo_config.py",
     code_files:   "list[str] | None" = None,
     pop:          int   = 30,
     units:        int   = 8,
@@ -489,17 +366,16 @@ def launch(
     look_back:           int   = 8,
     generate_final_mutations: bool = False,
     enable_genetic_drift: bool = True,
+    concurrency:  int   = 32,
+    fitness_cpus: "int | None" = None,
 ) -> str:
     """PATCH project with chromosome + fitness, then POST to start experiment.
 
     Returns experiment_id.
 
-    By default (MOXO-compatible path) uploads ``fitness_path`` as ``fitness.py``
-    plus ``config_path`` as ``moxo_config.py``.
-
-    Pass ``code_files`` (list of local paths) to upload an arbitrary set of
-    sibling Python modules instead. Each file is uploaded under its basename
-    (e.g. ``demos/.../renderer.py`` → ``renderer.py``). The first file whose
+    ``code_files`` (list of local paths, default ``["earth/fitness.py"]``) is the
+    set of sibling Python modules to upload. Each file is uploaded under its basename
+    (e.g. ``earth/fitness.py`` → ``fitness.py``). The first file whose
     basename is ``fitness.py`` (or the first file if none match) is treated as
     the fitness entry module by Earth convention; callers should include a
     ``fitness.py``.
@@ -507,21 +383,33 @@ def launch(
     chromo_yaml = open(chromo_path).read()
 
     if code_files is None:
-        fitness_payload = [
-            {"key": "fitness.py", "value": open(fitness_path).read(), "is_folder": False},
-            {"key": "moxo_config.py", "value": open(config_path).read(), "is_folder": False},
-        ]
-    else:
-        fitness_payload = []
-        for path in code_files:
-            p = Path(path)
-            fitness_payload.append({
-                "key": p.name,
-                "value": p.read_text(encoding="utf-8"),
-                "is_folder": False,
-            })
-        if not fitness_payload:
-            raise ValueError("code_files must contain at least one Python module")
+        code_files = ["earth/fitness.py"]
+    fitness_payload = []
+    for path in code_files:
+        p = Path(path)
+        fitness_payload.append({
+            "key": p.name,
+            "value": p.read_text(encoding="utf-8"),
+            "is_folder": False,
+        })
+    if not fitness_payload:
+        raise ValueError("code_files must contain at least one Python module")
+
+    intended = _ga_config(
+        pop, minutes, maximize,
+        elite_pct=elite_pct,
+        mutation_pct=mutation_pct,
+        unique_mutation_pct=unique_mutation_pct,
+        recalculate_elite=recalculate_elite,
+        max_stagnation_loops=max_stagnation_loops,
+        max_drifts=max_drifts,
+        steady_threshold=steady_threshold,
+        generation_start_steady=generation_start_steady,
+        look_back=look_back,
+        generate_final_mutations=generate_final_mutations,
+        enable_genetic_drift=enable_genetic_drift,
+        concurrency=concurrency,
+    )
 
     patch = {
         "chromosome": {"value": chromo_yaml},
@@ -529,20 +417,7 @@ def launch(
             "code": fitness_payload,
             "requirements": [],
         },
-        "configuration": _ga_config(
-            pop, minutes, maximize,
-            elite_pct=elite_pct,
-            mutation_pct=mutation_pct,
-            unique_mutation_pct=unique_mutation_pct,
-            recalculate_elite=recalculate_elite,
-            max_stagnation_loops=max_stagnation_loops,
-            max_drifts=max_drifts,
-            steady_threshold=steady_threshold,
-            generation_start_steady=generation_start_steady,
-            look_back=look_back,
-            generate_final_mutations=generate_final_mutations,
-            enable_genetic_drift=enable_genetic_drift,
-        ),
+        "configuration": intended,
         "dataset_id": dataset_id,
     }
     r = session.patch(
@@ -562,20 +437,6 @@ def launch(
 
     # Replace template configuration entirely. Merging ai1.ga into the clone
     # left genetic-drift operators active and did not cap live population.
-    intended = _ga_config(
-        pop, minutes, maximize,
-        elite_pct=elite_pct,
-        mutation_pct=mutation_pct,
-        unique_mutation_pct=unique_mutation_pct,
-        recalculate_elite=recalculate_elite,
-        max_stagnation_loops=max_stagnation_loops,
-        max_drifts=max_drifts,
-        steady_threshold=steady_threshold,
-        generation_start_steady=generation_start_steady,
-        look_back=look_back,
-        generate_final_mutations=generate_final_mutations,
-        enable_genetic_drift=enable_genetic_drift,
-    )
     cfg = deepcopy(intended)
 
     code_files = [
@@ -584,12 +445,14 @@ def launch(
     ]
 
     fu = dict(BASIC_COMPUTE_PROFILE)
+    if fitness_cpus is not None:
+        fu["fitness_cpu"] = int(fitness_cpus)
     fu["fitness_units_amount"] = units
     fu["total_cpus"]           = units * fu["fitness_cpu"] + 1
     fu["total_memory"]         = f"{(units + 1) * 8 + 2}.00Gi"
 
     body = {
-        "name":       proj.get("title", "moxo-ga"),
+        "name":       proj.get("title", "earth-ga"),
         "project_id": project_id,
         "shared":     False,
         "configuration": {
@@ -660,129 +523,6 @@ def _find_experiment_for_project(
         return str(eid) if eid else None
     except Exception:
         return None
-
-
-def extract_earth_ga_envelope(exp: dict, project: dict | None = None) -> dict:
-    """Read live Earth GA envelope from the experiment, then project as fallback."""
-    cfg = (exp or {}).get("configuration") or {}
-    lom = cfg.get("lom_configuration") or cfg.get("configuration") or cfg
-    if (not isinstance(lom, dict) or lom.get("ai1") is None) and project:
-        pcfg = project.get("configuration") or {}
-        if isinstance(pcfg, dict) and pcfg.get("ai1"):
-            lom = pcfg
-    ga = ((lom.get("ai1") or {}).get("ga") or {})
-    fu = cfg.get("fitness_unit") or {}
-    flow = ((lom.get("ai1") or {}).get("flow_control") or {})
-    drift = (lom.get("ai1") or {}).get("cumulative_genetic_drift") or {}
-    pop = ga.get("population_size")
-    if pop is None:
-        pop = exp.get("population_size")
-    return {
-        "population_size": pop,
-        "elite_percentage": ga.get("elite_percentage"),
-        "mutation_percentage": ga.get("mutation_percentage"),
-        "fitness_units": fu.get("fitness_units_amount"),
-        "experiment_population_size_field": exp.get("population_size"),
-        "chosen_drifts_names": drift.get("chosen_drifts_names"),
-        "ga": ga,
-        "flow_control": flow,
-        "fitness_unit": fu,
-        "cumulative_genetic_drift": drift,
-    }
-
-
-def expected_ga_envelope(earth_cfg: dict) -> dict:
-    expected = {
-        "population_size": int(earth_cfg.get("population_size", 12)),
-        "fitness_units": int(earth_cfg.get("fitness_units", 4)),
-        "elite_percentage": float(earth_cfg.get("elite_percentage", 0.15)),
-        "mutation_percentage": float(earth_cfg.get("mutation_percentage", 0.60)),
-    }
-    if earth_cfg.get("disable_genetic_drift"):
-        expected["chosen_drifts_names"] = []
-    return expected
-
-
-def ga_envelope_mismatches(actual: dict, expected: dict, *, abs_tol: float = 1e-6) -> list[str]:
-    """Return human-readable mismatches; empty means envelope matches."""
-    issues: list[str] = []
-    for key in ("population_size", "fitness_units"):
-        a, e = actual.get(key), expected.get(key)
-        if a is None or int(a) != int(e):
-            issues.append(f"{key}: earth={a!r} expected={e!r}")
-    for key in ("elite_percentage", "mutation_percentage"):
-        a, e = actual.get(key), expected.get(key)
-        if a is None or abs(float(a) - float(e)) > abs_tol:
-            issues.append(f"{key}: earth={a!r} expected={e!r}")
-    # Top-level experiment.population_size must agree with GA config.
-    raw = actual.get("experiment_population_size_field")
-    want = expected.get("population_size")
-    if raw is not None and want is not None and int(raw) != int(want):
-        issues.append(
-            f"experiment.population_size: earth={raw!r} expected={want!r}"
-        )
-    if "chosen_drifts_names" in expected:
-        a = list(actual.get("chosen_drifts_names") or [])
-        e = list(expected.get("chosen_drifts_names") or [])
-        if a != e:
-            issues.append(f"chosen_drifts_names: earth={a!r} expected={e!r}")
-    return issues
-
-
-def next_generation_population(
-    population: int, elite_percentage: float, mutation_percentage: float
-) -> int:
-    """Earth next-generation headcount: elites kept + mutants requested.
-
-    Empirically *not* truncated to ``population_size``. ``elite=0.5`` and
-    ``mutation=1.0`` yields 1.5× per generation (2 → 947 at gen 15).
-    ``elite=0.5`` and ``mutation=0.5`` yields 1+1=2 (fixed (1+1) envelope).
-    ``elite=0`` yields 0 elites and Earth stops producing generations.
-    """
-    p = int(population)
-    return int(round(float(elite_percentage) * p)) + int(
-        round(float(mutation_percentage) * p)
-    )
-
-
-def plus_elite_live_population(initial: int, elite_percentage: float, generation: int) -> int:
-    """Live size after ``generation`` steps of elite-only add (mutation=1.0).
-
-    Same recurrence as ``next_generation_population(p, elite, 1.0)``.
-    """
-    p = int(initial)
-    for _ in range(max(0, int(generation))):
-        p = next_generation_population(p, elite_percentage, 1.0)
-    return p
-
-
-def eval_count_implies_population_growth(
-    *,
-    eval_count: float | int | None,
-    generation: int | None,
-    population_size: int,
-    max_evals_per_generation_per_worker: float,
-) -> str | None:
-    """Return an issue if per-worker eval_count cannot fit a fixed population."""
-    if eval_count is None or generation is None:
-        return None
-    try:
-        count = float(eval_count)
-        gen = int(generation)
-        pop = int(population_size)
-        cap_per_gen = float(max_evals_per_generation_per_worker)
-    except (TypeError, ValueError):
-        return None
-    if count != count or gen < 0 or pop <= 0 or cap_per_gen <= 0:
-        return None
-    denom = max(1, gen)
-    implied = count / denom
-    if implied > cap_per_gen:
-        return (
-            f"eval_count={count:g} at gen={gen} implies {implied:.1f} evals/gen "
-            f"on one worker; cap is {cap_per_gen:g} for population_size={pop}"
-        )
-    return None
 
 
 # ── Poll / abort ───────────────────────────────────────────────────────────────
@@ -875,48 +615,3 @@ def poll(session: requests.Session, headers: dict, exp_id: str) -> dict:
 def abort(session: requests.Session, headers: dict, exp_id: str) -> None:
     session.post(f"{BASE}/api/experiments/{exp_id}/abort", headers=headers)
     print(f"Aborted experiment {exp_id}")
-
-
-# ── Example script ─────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Launch a moxo Earth GA experiment")
-    parser.add_argument("--csv",     required=True, help="Path to the training CSV")
-    parser.add_argument("--name",    default="moxo-clustering-ga", help="Dataset / project name")
-    parser.add_argument("--pop",     type=int, default=30,  help="GA population size")
-    parser.add_argument("--units",   type=int, default=8,   help="Fitness units (parallel workers)")
-    parser.add_argument("--minutes", type=int, default=60,  help="Wall-clock budget in minutes")
-    parser.add_argument("--out",     default="winning_chromosome.json", help="Output file for best chromosome")
-    args = parser.parse_args()
-
-    session, headers = auth()
-
-    dataset_id = upload_dataset(session, headers, args.csv, args.name)
-    project_id = clone_template(session, headers, CHURN_TEMPLATE_ID, dataset_id, args.name)
-
-    exp_id = launch(session, headers, project_id, dataset_id,
-                    chromo_path="earth/chromosome.yaml",
-                    fitness_path="earth/fitness.py",
-                    config_path="earth/moxo_config.py",
-                    pop=args.pop, units=args.units, minutes=args.minutes)
-
-    prev_score = None
-    while True:
-        time.sleep(180)
-        state = poll(session, headers, exp_id)
-        print(f"  [{state['status']}] gen={state['generation']}  score={state['score']}")
-        if state["status"] in ("COMPLETED", "STAGNATED", "ERROR"):
-            break
-        if prev_score is not None and state["score"] is not None:
-            if abs(state["score"] - prev_score) < 0.001:
-                abort(session, headers, exp_id)
-                break
-        prev_score = state["score"]
-
-    final = poll(session, headers, exp_id)
-    Path(args.out).write_text(json.dumps(final["chromosome"], indent=2))
-    print(f"\nBest score: {final['score']}")
-    print(f"Scalars:    {json.dumps(final['scalars'], indent=2)}")
-    print(f"Chromosome saved to {args.out}")

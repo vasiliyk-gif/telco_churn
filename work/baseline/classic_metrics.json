@@ -1,0 +1,49 @@
+{
+  "value_model": "xgboost depth=4 trees=700 lr=0.03",
+  "value_genes": {
+    "use_age": true,
+    "use_location": true,
+    "use_basement_garage": true,
+    "use_extras": true,
+    "drop_big_houses": true,
+    "use_quantile": false,
+    "quantile_alpha": 0.5,
+    "ridge_alpha": 10.0,
+    "xgb": {
+      "n_estimators": 700,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8
+    },
+    "w_xgb": 1.0,
+    "log_price": true
+  },
+  "rmse": 26954.039515849337,
+  "mape": 0.08663541508853366,
+  "best_flat": {
+    "margin": 0.18,
+    "risk_adj_per_listing": -160.47099005083948,
+    "profit_per_listing": 547.2878030598796,
+    "losses_per_listing": -1415.517586221438,
+    "share_bought": 0.23475811031954863,
+    "per_year": {
+      "risk_adj_per_listing_2007": -592.982330047909,
+      "risk_adj_per_listing_2008": -25.35740006236044,
+      "risk_adj_per_listing_2009": 173.05094974103147
+    }
+  },
+  "flat_10pct": {
+    "margin": 0.1,
+    "risk_adj_per_listing": -2781.6474337673526,
+    "profit_per_listing": -955.9693613394712,
+    "losses_per_listing": -3651.356144855763,
+    "share_bought": 0.5468925520837397,
+    "per_year": {
+      "risk_adj_per_listing_2007": -2795.42807228897,
+      "risk_adj_per_listing_2008": -2216.0987434143635,
+      "risk_adj_per_listing_2009": -3309.7454619549408
+    }
+  },
+  "risk_weight": 0.5
+}

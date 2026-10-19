@@ -1,7 +1,11 @@
 # DS Project Delivery Practices (One-Pager)
 
-**Full detail:** [PROJECT_DELIVERY_PRACTICES.md](PROJECT_DELIVERY_PRACTICES.md)
-**Supersedes:** [Archive/PROJECT_LIFECYCLE_ONE_PAGER_V0.md](Archive/PROJECT_LIFECYCLE_ONE_PAGER_V0.md)
+> **In this homework:** use this page as the map of phases and practices. The full
+> practices document and the other methodologies it names are not part of this repo;
+> the one methodology you need is [TABULAR_EDA_AND_SPLIT_GUIDELINES.md](TABULAR_EDA_AND_SPLIT_GUIDELINES.md).
+> The homework steps are in the [README](../../README.md); the homework pathway is
+> [context/pathway.md](../pathway.md).
+
 **Part of:** the org's DS Delivery Operating System v4.0 (Tier 2 — Practices).
 
 ## Purpose
@@ -16,7 +20,7 @@ org's v4.0 standard.
 |---|---|---|
 | 1. Phase | 5 top-level stages of project evolution | Owned by v4.0 |
 | 2. Practice | 12 recurring units of work, each with inputs/outputs/DoD | `PROJECT_DELIVERY_PRACTICES.md` (this doc's detail) |
-| 3. Methodology | Modality/engine/approach-specific guidance | [`Methodologies_&_Guidelines/`](Methodologies_&_Guidelines/) |
+| 3. Methodology | Modality/engine/approach-specific guidance | `Methodologies_&_Guidelines/` (not in this repo) |
 
 ## Phases → Practices
 
@@ -69,7 +73,7 @@ Packaging)`
 ## Not Every Project Is Classification
 
 For unsupervised/no-ground-truth work (e.g. clustering), several Practices change shape —
-see [Clustering EDA & Methodology](Methodologies_&_Guidelines/CLUSTERING_EDA_AND_METHODOLOGY.md)
+see Clustering EDA & Methodology
 *(initial framing)*: Success Criteria needs an evaluation *proxy* instead of a labeled
 metric, and Data Foundation adds scale-sensitivity and routing-covariate checks.
 
@@ -77,10 +81,10 @@ metric, and Data Foundation adds scale-sensitivity and routing-covariate checks.
 
 | Methodology | Supports |
 |---|---|
-| [Tabular EDA & Split Guidelines](Methodologies_&_Guidelines/TABULAR_EDA_AND_SPLIT_GUIDELINES.md) | Data Foundation |
-| [Audio Data EDA & Split Guidelines](Methodologies_&_Guidelines/AUDIO_DATA_EDA_AND_SPLIT_GUIDELINES.md) | Data Foundation |
-| [Audio vs. Tabular EDA](Methodologies_&_Guidelines/AUDIO_VS_TABULAR_EDA_ONE_PAGER.md) | Data Foundation |
-| [Clustering EDA & Methodology](Methodologies_&_Guidelines/CLUSTERING_EDA_AND_METHODOLOGY.md) *(initial framing)* | Success Criteria, Data Foundation, Solution Design, Baseline Evidence, Optimization Formulation |
+| [Tabular EDA & Split Guidelines](TABULAR_EDA_AND_SPLIT_GUIDELINES.md) | Data Foundation |
+| Audio Data EDA & Split Guidelines | Data Foundation |
+| Audio vs. Tabular EDA | Data Foundation |
+| Clustering EDA & Methodology *(initial framing)* | Success Criteria, Data Foundation, Solution Design, Baseline Evidence, Optimization Formulation |
 | Earth GA Optimization Methodology *(to write)* | Optimization Formulation, Packaging, Execution |
 | Inference Packaging & Rollback Methodology *(to write)* | Production Packaging |
 | Monitoring & Retraining Methodology *(to write)* | Deployment & Monitoring |
@@ -88,6 +92,5 @@ metric, and Data Foundation adds scale-sensitivity and routing-covariate checks.
 ## Principle
 
 Practices apply when their guidance is relevant — they guide the work, they don't define
-project status. See `PROJECT_DELIVERY_PRACTICES.md` for full inputs/outputs/DoD/anti-patterns
-per Practice, and `ASSIGNMENT_OBJECTIVE_SCOPE_PLAN.md` for open items still pending
-teamlead sign-off.
+project status. The full practices document (inputs, outputs, DoD and anti-patterns per Practice)
+is an internal reference and is not needed for this homework.
